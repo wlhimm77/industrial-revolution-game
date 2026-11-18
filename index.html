@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toil & Iron: Industrial Revolution Survival</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Victorian Industrial Theme */
+        :root {
+            --coal-dark: #141210;
+            --soot-gray: #1f1c18;
+            --iron-panel: #292520;
+            --brass-gold: #c8963e;
+            --rust-red: #9e2a2b;
+            --parchment: #e6dfd3;
+        }
+
+        html, body {
+            min-height: 100%;
+            height: auto;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        body {
+            background-color: var(--coal-dark);
+            color: var(--parchment);
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(200, 150, 62, 0.08) 0%, transparent 60%),
+                repeating-linear-gradient(45deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 2px, transparent 2px, transparent 8px);
+        }
+
+        .mobile-scroll-clearance {
+            padding-bottom: calc(6rem + env(safe-area-inset-bottom, 24px));
+        }
+
+        .font-display {
+            font-family: 'Cinzel', 'Noto Sans TC', serif;
+        }
+
+        /* Animated Steam & Gear Background Accent */
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .gear-spin {
+            animation: spinSlow 45s linear infinite;
+        }
+
+        /* Card & Button Styling */
+        .victorian-card {
+            background: linear-gradient(145deg, #26221d, #1c1915);
+            border: 1px solid #443c32;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .choice-btn {
+            background: linear-gradient(180deg, #322d26 0%, #24201b 100%);
+            border: 1px solid #52483c;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .choice-btn:hover:not(:disabled) {
+            border-color: var(--brass-gold);
+            background: linear-gradient(180deg, #3d362d 0%, #2b2620 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(200, 150, 62, 0.2);
+        }
+        .choice-btn:active:not(:disabled) {
+            transform: scale(0.99);
+            border-color: var(--brass-gold);
+        }
+        .choice-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .brass-btn {
+            background: linear-gradient(180deg, #d4a349 0%, #a67828 100%);
+            color: #141210;
+            font-weight: 700;
+            border: 1px solid #f0c975;
+            box-shadow: 0 4px 12px rgba(200, 150, 62, 0.3);
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .brass-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+        .brass-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Progress Bar Transitions */
+        .stat-bar {
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease;
+        }
+
+        /* Subtle Shake on Harsh Damage */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #141210; }
+        ::-webkit-scrollbar-thumb { background: #443c32; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c8963e; }
+    </style>
+</head>
+<body class="block p-2 sm:p-4 select-none">
+
+    <!-- Background Decorative SVG Gear -->
+    <div class="fixed -top-24 -right-24 opacity-5 pointer-events-none z-0">
+        <svg class="w-96 h-96 gear-spin text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+        </svg>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <header class="relative z-10 max-w-5xl w-full mx-auto shrink-0 flex items-center justify-between gap-2 pb-1.5 sm:pb-2.5 border-b border-stone-700/80">
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-lg bg-amber-900/40 border border-amber-600/60 flex items-center justify-center text-amber-400">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+            </div>
+            <div class="truncate">
+                <h1 id="ui-header-title" class="font-display text-sm sm:text-lg font-bold text-amber-400 tracking-wide truncate leading-tight">TOIL & IRON</h1>
+                <p id="ui-header-sub" class="text-[10px] sm:text-xs text-stone-400 truncate leading-tight">Britain, 1760s–1870s • Proletariat Survival</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <!-- Textbook Reference Modal Button -->
+            <button onclick="toggleArchiveModal(true)" class="px-2 py-1.5 sm:px-3 rounded-lg bg-stone-800 hover:bg-stone-700 active:scale-95 border border-stone-600 text-[11px] sm:text-xs font-medium text-amber-300 flex items-center gap-1 transition">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <span id="ui-btn-archive">Notes</span>
+            </button>
+
+            <!-- Language Switcher (Default English / Traditional Chinese) -->
+            <button onclick="switchLanguage()" class="px-2 py-1.5 sm:px-3 rounded-lg bg-amber-950/60 hover:bg-amber-900/70 active:scale-95 border border-amber-600/60 text-[11px] sm:text-xs font-semibold text-amber-200 flex items-center gap-1 transition">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+                <span id="ui-lang-label">繁體中文</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Game Container (Natural Document Flow + Safe Bottom Scroll Clearance for Mobile Browsers) -->
+    <main id="game-root" class="relative z-10 max-w-5xl w-full mx-auto pt-2 sm:pt-3 mobile-scroll-clearance">
+        <!-- Dynamic Screen Content Rendered by JS -->
+    </main>
+
+    <!-- Textbook Archive / Historical Reference Modal -->
+    <div id="archive-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="victorian-card max-w-2xl w-full rounded-xl p-5 sm:p-6 max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center pb-3 border-b border-stone-700">
+                <h2 id="ui-modal-title" class="font-display text-lg sm:text-xl font-bold text-amber-400">Textbook Historical Reference</h2>
+                <button onclick="toggleArchiveModal(false)" class="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div id="archive-content" class="overflow-y-auto py-4 space-y-4 text-sm text-stone-300 leading-relaxed pr-1">
+                <!-- Populated dynamically based on current language -->
+            </div>
+            <div class="pt-3 border-t border-stone-700 flex justify-end">
+                <button onclick="toggleArchiveModal(false)" id="ui-modal-close" class="brass-btn px-5 py-2 rounded-lg text-sm">Close Archive</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ============================================================================
+         * HISTORICAL DATA & GAME SCRIPT (BILINGUAL: ENGLISH & TRADITIONAL CHINESE)
+         * Strictly grounded in Ling Kee Junior History Topic 5 (pp. 40-66)
+         * ============================================================================
+         */
+        let currentLang = 'en'; // Default language: English ('en' or 'zh')
+
+        // Game State
+        let state = {
+            screen: 'intro', // 'intro', 'play', 'outcome', 'end'
+            endTab: 'summary', // 'summary' or 'reflection' (allows zero-scroll tab switching on end screen)
+            round: 0, // 0 to 6 (7 Rounds total)
+            health: 75,     // Physical & Mental Health (0 = Collapse/Death)
+            wealth: 8,      // Savings in Dollars (Need >= $32 by end of Round 7 to escape slum/survive)
+            rights: 10,     // Worker Solidarity & Rights Awareness (Need >= 70% for Reform/Union victory)
+            exhaustion: 15, // Cumulative fatigue from 12-16h shifts (100 = Fatal exhaustion)
+            lastOutcome: null,
+            historyLog: [],
+            victoryType: null // 'fail_health', 'fail_poverty', 'fail_crushed', 'win_survivor', 'win_reformer'
+        };
+
+        // Bilingual UI Dictionary & Complete 7-Round Historical Campaign
+        const CONTENT = {
+            en: {
+                headerTitle: "TOIL & IRON",
+                headerSub: "Britain, 1760s–1890s • Working Class Survival Simulation",
+                btnArchive: "Textbook Notes",
+                langBtn: "繁體中文",
+                footerSource: "Source: Ling Kee History Topic 5 — The Industrial Revolution (pp. 40–66)",
+                footerMode: "Solo Offline Classroom Edition • 7 Rounds • Harsh Historical Realism",
+                modalTitle: "Key Historical Facts (Textbook pp. 40–66)",
+                modalClose: "Return to Game",
+
+                // Intro Screen
+                introBadge: "HISTORICAL ROLE-PLAY SIMULATION",
+                introTitle: "Can You Survive the Age of Machines?",
+                introDesc: "You are a former rural farmer dispossessed by the 17th–18th century Enclosure Movement. Forced into a crowded British industrial city like Manchester, you belong to the Proletariat (working class). You must survive 7 historical stages (Rounds) from the 1760s to the 1890s.",
+                winTitle: "Harsh Victory Conditions (End of Round 7):",
+                winCond1: "1. Stay Alive: Health > 0 and Exhaustion < 100.",
+                winCond2: "2. Escape Destitution: Accumulate at least $32 in savings despite meagre wages.",
+                winCond3: "3. Secure Labour Dignity: Reach at least 70% Worker Solidarity & Rights.",
+                hudGoalReminder: "Win Goals: ❤️>0 • ⛓️<100 • 💵≥$32 • ✊≥70%",
+                warningNote: "Historical Warning: Industrial capitalists paid barely enough for bread. Overworking causes fatal illness, while striking too early without support invites harsh suppression.",
+                startBtn: "Enter the Factory Gates (Start Round 1)",
+
+                // HUD Labels
+                roundLabel: "ROUND",
+                ofLabel: "OF 7",
+                statHealth: "Health",
+                statWealth: "Savings",
+                statRights: "Worker Rights",
+                statExhaustion: "Exhaustion",
+                unitDollar: "$",
+                impactPrefix: "Predicted Impact:",
+                dailyScheduleTitle: "Typical Factory Day (Textbook p. 61)",
+                dailyScheduleText: "06:00–18:30+ (12–16h shift)",
+                nextRoundBtn: "Proceed to Next Era →",
+                finalResultBtn: "See Your Historical Fate →",
+                playAgainBtn: "Play Again",
+                primarySourceLabel: "TEXTBOOK",
+                consequenceLabel: "CONSEQUENCE OF YOUR ACTION",
+                tabFateLabel: "1. Your Fate",
+                tabReflectLabel: "2. Textbook Reflection",
+
+                // Reflective Textbook Debrief (End Screen)
+                reflectionBadge: "HISTORICAL REFLECTION & TEXTBOOK SYNTHESIS",
+                reflectionTitle: "Connecting Your Experience to History (Textbook pp. 44–66)",
+                reflectionPoints: [
+                    {
+                        concept: "1. Class Divide (pp. 59, 64–65)",
+                        detail: "Notice how hard it was to save even $32 across seven decades while staying alive. Under the factory system, the industrial-capitalist class accumulated vast wealth from railways and global trade, while the proletariat (working class) endured 12–16 hour shifts for subsistence wages."
+                    },
+                    {
+                        concept: "2. Why Individual Survival Was Nearly Impossible (pp. 60–62)",
+                        detail: "Working overtime alone only drained your Health and spiked Exhaustion. Unhygienic slums without sewerage spread cholera, and families were forced to rely on child labour at one-third of adult pay."
+                    },
+                    {
+                        concept: "3. Collective Action, Suffrage & Legal Reform (pp. 62–63, 66)",
+                        detail: "Just as you needed ≥70% Worker Rights to win, real British workers could not improve their lives alone. Through trade unions, the Chartist Movement (1838–1858), and socialist ideas, they pressured Parliament into passing the Factory Acts (1833–1847), legalising trade unions (1871), and expanding male voting rights."
+                    }
+                ],
+                reflectionQuestionTitle: "Classroom Enquiry Question (Textbook p. 56 & p. 62):",
+                reflectionQuestion: "After experiencing the harsh life of a 19th-century factory worker across the Ages of Steam and Electricity, how would you balance the technological achievements of the Industrial Revolution against its human cost?",
+
+                // Textbook Archive Modal Content
+                archiveSections: [
+                    {
+                        title: "1. Why Britain? Enclosure & Urbanisation (pp. 41–43, 58)",
+                        body: "The Enclosure Movement saw nobles and landowners enclose farmland into large pastures for wool. Millions of farmers lost their land and flooded into cities near coal mines (like Manchester and Liverpool), providing abundant cheap labour for the factory system."
+                    },
+                    {
+                        title: "2. Mechanisation, Steam & Electricity (pp. 44–49)",
+                        body: "In 1764, the Spinning Jenny marked the start of the Industrial Revolution. In 1769, James Watt improved the steam engine, freeing factories from rivers. In 1879, Thomas Edison invented durable electric light bulbs, ushering in the Age of Electricity and longer night shifts."
+                    },
+                    {
+                        title: "3. Transport & Communication Revolutions (pp. 50–52)",
+                        body: "Britain built canals (from 1761) and railways—in 1830, George Stephenson's 'Rocket' linked Manchester and Liverpool, cutting London–Manchester travel from 5 days by horse carriage to 8 hours by train. Telegraphs (1835) and telephones (1876) sped up global trade."
+                    },
+                    {
+                        title: "4. Harsh Life of the Proletariat & Child Labour (pp. 59–62)",
+                        body: "Workers laboured 12–16 hours daily in unguarded factories, lived in unhygienic slums lacking clean water or sewerage, and suffered from cholera and malnutrition. Factories hired children at 1/3 adult pay to crawl beneath machines or haul coal in narrow tunnels."
+                    },
+                    {
+                        title: "5. Trade Unions, Factory Acts & Political Reform (pp. 62–66)",
+                        body: "Workers formed trade unions and launched the Chartist Movement (1838–1858) demanding shorter hours, higher pay, and universal suffrage. Parliament passed the Factory Acts (1833, 1844, 1847), legalised trade unions in 1871, and gradually extended voting rights to male workers."
+                    }
+                ],
+
+                // 7 Historical Rounds
+                rounds: [
+                    {
+                        era: "ROUND 1 • 1760s–1780s",
+                        title: "From Farm to Factory: The Spinning Jenny & Steam",
+                        context: "After losing your farmland in the Enclosure Movement, your household handcrafting can no longer compete with the Spinning Jenny (1764) and James Watt's improved steam engine (1769). You arrive in Manchester seeking work in a new steam-powered cotton textile factory.",
+                        dilemma: "The factory owner offers a strict contract under the new division of labour: 14 hours a day beside unguarded machines for a meagre $9 a week. Slum rent and coarse bread cost $7.",
+                        sourceNote: "Textbook pp. 42, 44, 48, 56: Factories concentrated workers using large steam-driven machines, replacing slow household handcrafting.",
+                        choices: [
+                            {
+                                title: "Accept the 14-Hour Shift & Live in the Crowded Slum",
+                                desc: "Endure brutal hours in a damp basement room shared with two other families to save every dollar.",
+                                req: null,
+                                effects: { health: -14, wealth: +5, rights: 0, exhaustion: +18 },
+                                outcomeTitle: "Exhausting Survival in the Slums",
+                                outcomeText: "You work from 06:00 to 20:00 with only a 45-minute lunch break. Your room has no drainage or clean water, leaving you coughing from cotton dust, but you manage to save $5."
+                            },
+                            {
+                                title: "Rent a Slightly Cleaner Attic & Work Standard 12 Hours",
+                                desc: "Spend almost your entire wage on better shelter and food to protect your body.",
+                                req: null,
+                                effects: { health: -5, wealth: +2, rights: +5, exhaustion: +10 },
+                                outcomeTitle: "Barely Making Ends Meet",
+                                outcomeText: "You keep your strength better than your neighbours, and you have an hour in the evening to talk with fellow spinners, though your savings grow very slowly."
+                            },
+                            {
+                                title: "Smash the New Power Looms with Angry Handloom Weavers",
+                                desc: "Resist mechanisation directly by sabotaging machines that took rural jobs.",
+                                req: null,
+                                effects: { health: -22, wealth: -4, rights: +10, exhaustion: +14 },
+                                outcomeTitle: "Brutal Crackdown by Factory Guards",
+                                outcomeText: "The British government fiercely protects inventors' patents and capitalist property. Armed guards beat you badly, dock your pay, and blacklist you for weeks."
+                            }
+                        ]
+                    },
+                    {
+                        era: "ROUND 2 • 1810s–1820s",
+                        title: "The Family Breadline & Child Labour",
+                        context: "The factory system has expanded across coal-rich northern Britain. Living costs surge while capitalist factory owners cut adult wages to maximise profits. Your 10-year-old child cannot afford school, and your household is falling into debt.",
+                        dilemma: "The textile mill overseer offers to hire your 10-year-old child to crawl underneath moving spinning mules to clear cotton waste—for one-third of an adult's wage.",
+                        sourceNote: "Textbook p. 62: Child labourers worked over a dozen hours daily for 1/3 adult pay, beaten by overseers with whips or rods.",
+                        choices: [
+                            {
+                                title: "Send Your Child into the Textile Mill",
+                                desc: "You desperately need the extra dollars so the family does not starve.",
+                                req: null,
+                                effects: { health: -10, wealth: +8, rights: -5, exhaustion: +12 },
+                                outcomeTitle: "A Parent's Heartbreak",
+                                outcomeText: "The extra income keeps bread on the table, but your child returns bruised from the overseer's leather strap, suffering from hearing loss and a curving spine."
+                            },
+                            {
+                                title: "Refuse Child Labour & Work Dangerous Overtime in the Coal Pit",
+                                desc: "Protect your child by taking extra night shifts hauling coal to fuel steam engines.",
+                                req: null,
+                                effects: { health: -20, wealth: +5, rights: +5, exhaustion: +22 },
+                                outcomeTitle: "Black Lung and Broken Back",
+                                outcomeText: "Your child stays safe from the machines, but breathing coal dust underground severely damages your lungs and pushes your body near its limit."
+                            },
+                            {
+                                title: "Join Secret Underground Trade Union Meetings",
+                                desc: "Trade unions are still restricted, so workers meet in secret to pool emergency funds and demand safer mills.",
+                                req: null,
+                                effects: { health: -8, wealth: -2, rights: +16, exhaustion: +10 },
+                                outcomeTitle: "Seeds of Proletarian Solidarity",
+                                outcomeText: "You pay $2 in secret union dues. Though money is tight, you forge strong bonds with fellow workers preparing to challenge capitalist exploitation."
+                            }
+                        ]
+                    },
+                    {
+                        era: "ROUND 3 • 1825–1830",
+                        title: "Iron Horses & The Railway Boom",
+                        context: "Coal-fired steelmaking has matured, and Britain enters the Railway Age! In 1825 Britain opens its first steam railway, and in 1830 George Stephenson's locomotive 'Rocket' connects Manchester to Liverpool—cutting travel from 5 days by horse carriage to just 8 hours.",
+                        dilemma: "Railway contractors urgently hire navvies to blast tunnels and lay iron tracks, while factory bosses demand faster output to fill trainloads of export goods.",
+                        sourceNote: "Textbook pp. 49–51, 58: Steelmaking matured; Stephenson built the 'Rocket' (1830), linking industrial cities near coal mines.",
+                        choices: [
+                            {
+                                title: "Work as a Railway Navvy Laying the Manchester–Liverpool Line",
+                                desc: "Dangerous blasting and heavy iron-rail lifting pay higher wages than the textile mill.",
+                                req: null,
+                                effects: { health: -16, wealth: +9, rights: +4, exhaustion: +18 },
+                                outcomeTitle: "Blood and Sweat Along the Iron Tracks",
+                                outcomeText: "Explosives and collapsing embankments injure dozens of navvies, yet you survive with $9 in hard-earned pay as the 'Rocket' roars down the line."
+                            },
+                            {
+                                title: "Organise Canal & Railway Freight Workers for Safe Conditions",
+                                desc: "Unite transport and mill hands to demand accident compensation and rest breaks.",
+                                req: null,
+                                effects: { health: -6, wealth: +1, rights: +14, exhaustion: +10 },
+                                outcomeTitle: "Connecting Cities, Connecting Workers",
+                                outcomeText: "Just as railways linked industrial cities across Britain, your network unites workers from Manchester to Liverpool in shared solidarity."
+                            },
+                            {
+                                title: "Take a Brief Rest & Patch Up Your Slum Roof Before Winter",
+                                desc: "Skip extra shifts to recover from years of relentless toil and repair your leaking room.",
+                                req: { stat: 'wealth', val: 4, label: "Requires $4 Savings" },
+                                effects: { health: +12, wealth: -4, rights: 0, exhaustion: -16 },
+                                outcomeTitle: "A Rare Breath of Recovery",
+                                outcomeText: "Spending $4 on food and roof repairs restores your battered strength just in time for the harsher decades ahead."
+                            }
+                        ]
+                    },
+                    {
+                        era: "ROUND 4 • 1833",
+                        title: "Slum Pestilence & The 1833 Factory Act",
+                        context: "Rapid urbanisation has turned industrial towns into overcrowded hubs lacking proper sewerage. Cholera breaks out in the slums! Meanwhile, Parliament debates the 1833 Factory Act after public outrage over factory conditions.",
+                        dilemma: "Fever spreads down your narrow street while the factory owner demands unpaid overtime to fill an overseas export order.",
+                        sourceNote: "Textbook pp. 53, 62–63: Infectious diseases spread in slums; vaccines emerged, and the 1833 Factory Act first limited child working hours.",
+                        choices: [
+                            {
+                                title: "Spend Savings on Clean Water & New Medical Inoculation",
+                                desc: "Pay $6 for boiled water, limewash, and local clinic treatment against infectious disease.",
+                                req: { stat: 'wealth', val: 6, label: "Requires $6 Savings" },
+                                effects: { health: +14, wealth: -6, rights: 0, exhaustion: -6 },
+                                outcomeTitle: "Saved by Sanitation and Medicine",
+                                outcomeText: "While cholera devastates unhygienic tenements around you, your investment in clean water and early medical care keeps you alive."
+                            },
+                            {
+                                title: "Work the Forced Overtime & Risk the Slum Epidemic",
+                                desc: "Ignore the sickness and toil 16 hours a day to earn the owner's small bonus.",
+                                req: null,
+                                effects: { health: -22, wealth: +7, rights: -5, exhaustion: +20 },
+                                outcomeTitle: "Fever in the Damp Tenement",
+                                outcomeText: "You earn $7, but contaminated water gives you a severe fever. You barely drag yourself to the loom each morning."
+                            },
+                            {
+                                title: "Testify to Government Inspectors for the 1833 Factory Act",
+                                desc: "Risk being fired by reporting illegal 14-hour child shifts to parliamentary commissioners.",
+                                req: null,
+                                effects: { health: -7, wealth: -1, rights: +16, exhaustion: +7 },
+                                outcomeTitle: "Parliament Passes the 1833 Factory Act",
+                                outcomeText: "Your testimony helps pass the 1833 Factory Act, capping hours for children aged 9–13 at 9 hours! The furious mill owner cuts your bonus, but workers hail your courage."
+                            }
+                        ]
+                    },
+                    {
+                        era: "ROUND 5 • 1838–1848",
+                        title: "The Chartist Movement & The Hungry Forties",
+                        context: "Industrialists grow fabulously wealthy from global colonial trade, yet workers have no right to vote in Parliament. Between 1838 and 1858, workers launch the Chartist Movement demanding shorter hours, higher wages, and universal suffrage.",
+                        dilemma: "Tens of thousands of workers gather on the moor for a massive Chartist rally and strike, just as Parliament considers the 1844 and 1847 Factory Acts.",
+                        sourceNote: "Textbook pp. 63–65: Workers organised the Chartist Movement (1838–1858) and pushed for the 1844 & 1847 Factory Acts (10-hour limit).",
+                        choices: [
+                            {
+                                title: "March in the Chartist Rally & Go on Strike",
+                                desc: "Forfeit a week's wages to demand the People's Charter and the 10-Hour Workday.",
+                                req: null,
+                                effects: { health: -9, wealth: -5, rights: +20, exhaustion: +5 },
+                                outcomeTitle: "The 1847 Factory Act (Ten Hours Act)",
+                                outcomeText: "Although Parliament rejects the Chartist petition, mass pressure forces the 1844 and 1847 Factory Acts, cutting women's and youths' work to 10 hours a day!"
+                            },
+                            {
+                                title: "Cross the Picket Line as a Strikebreaker",
+                                desc: "Work double shifts while others strike; the capitalist owner pays double wages.",
+                                req: null,
+                                effects: { health: -14, wealth: +12, rights: -22, exhaustion: +18 },
+                                outcomeTitle: "Blood Money, Bitter Isolation",
+                                outcomeText: "Your pocket grows heavy with $12, but your neighbours shun you as a traitor to the working class."
+                            },
+                            {
+                                title: "Organise a Cooperative Food & Mutual Aid Fund",
+                                desc: "Use your standing among workers to buy wholesale flour and support striking families.",
+                                req: { stat: 'rights', val: 25, label: "Requires 25% Worker Rights" },
+                                effects: { health: +6, wealth: +3, rights: +14, exhaustion: +4 },
+                                outcomeTitle: "Strength Through Mutual Aid",
+                                outcomeText: "Pooling resources keeps striking families fed and proves that disciplined working-class organisation can endure capitalist lockouts."
+                            }
+                        ]
+                    },
+                    {
+                        era: "ROUND 6 • 1851–1871",
+                        title: "The Great Exhibition, Socialism & Trade Union Act",
+                        context: "Britain showcases over 100,000 industrial marvels at the 1851 Great Exhibition. Meanwhile, thinkers like Karl Marx publish socialist ideas criticising capitalist exploitation, and workers push toward the Trade Union Act of 1871.",
+                        dilemma: "Your body bears decades of industrial scars. How will you navigate the rise of socialism and the decisive push for union legalisation?",
+                        sourceNote: "Textbook pp. 49, 63, 66: 1851 Great Exhibition; emergence of socialism (Karl Marx); Britain finally legalised trade unions in 1871.",
+                        choices: [
+                            {
+                                title: "Lead the Final Push for the 1871 Trade Union Legalisation",
+                                desc: "Unite skilled and factory workers to win permanent legal recognition and collective bargaining.",
+                                req: { stat: 'rights', val: 35, label: "Requires 35% Worker Rights" },
+                                effects: { health: -5, wealth: +6, rights: +18, exhaustion: +7 },
+                                outcomeTitle: "1871: Trade Unions Legalised!",
+                                outcomeText: "Britain finally legalises trade unions in 1871! Collective bargaining secures safer workshops and steadier pay across industrial towns."
+                            },
+                            {
+                                title: "Take a Skilled Machine-Maintenance Post",
+                                desc: "Use decades of experience to maintain iron machinery for steady, higher pay.",
+                                req: { stat: 'health', val: 30, label: "Requires 30% Health" },
+                                effects: { health: -7, wealth: +10, rights: +4, exhaustion: +10 },
+                                outcomeTitle: "Master of the Iron Machines",
+                                outcomeText: "As Britain enters the mature machinery industry, your technical skill earns higher wages without the worst dust of the spinning floor."
+                            },
+                            {
+                                title: "Work Until Collapse on the Assembly Floor",
+                                desc: "Push your frail body through relentless shifts to scrape together rent money.",
+                                req: null,
+                                effects: { health: -18, wealth: +8, rights: 0, exhaustion: +20 },
+                                outcomeTitle: "A Lifetime Spent in the Mill",
+                                outcomeText: "You squeeze out a few more dollars from the relentless machines, at a heavy cost to your aging body."
+                            }
+                        ]
+                    },
+                    {
+                        era: "ROUND 7 • 1879–1890s",
+                        title: "The Age of Electricity & Working-Class Suffrage",
+                        context: "In 1879, Thomas Edison invents durable electric light bulbs, launching the 'Age of Electricity' alongside telegraphs and telephones. Factories now run day and night under electric lamps, while newly enfranchised male workers rally for political representation.",
+                        dilemma: "In this final decisive era, electric lighting extends factory hours, while your union prepares to use workers' new voting power to shape Britain's future.",
+                        sourceNote: "Textbook pp. 44, 52, 62–63: Age of Electricity (Edison, 1879); male workers gained voting rights, leading toward the Labour Party.",
+                        choices: [
+                            {
+                                title: "Campaign for Working-Class Parliamentary Representation",
+                                desc: "Mobilise newly enfranchised male workers and trade unions to elect pro-worker representatives.",
+                                req: { stat: 'rights', val: 40, label: "Requires 40% Worker Rights" },
+                                effects: { health: -4, wealth: +6, rights: +18, exhaustion: +6 },
+                                outcomeTitle: "A Voice in Parliament at Last",
+                                outcomeText: "Armed with legal trade unions and the ballot box, workers compel politicians to pass public housing and pension reforms, securing your twilight years!"
+                            },
+                            {
+                                title: "Work Under Electric Lamps in a Modernised Electrical Plant",
+                                desc: "Endure brightly lit night shifts in the booming electrical industry for high late-Victorian wages.",
+                                req: null,
+                                effects: { health: -14, wealth: +11, rights: +3, exhaustion: +16 },
+                                outcomeTitle: "Sleepless Nights Under Electric Light",
+                                outcomeText: "Edison's bulbs turn night into day. You earn $11 in the expanding electrical sector, though disrupted sleep taxes your frail health."
+                            },
+                            {
+                                title: "Retire Quietly & Mentor Young Apprentices in Safety",
+                                desc: "Step back from the heaviest machines to teach younger workers union solidarity and machine safety.",
+                                req: { stat: 'wealth', val: 20, label: "Requires $20 Savings" },
+                                effects: { health: +10, wealth: +5, rights: +12, exhaustion: -12 },
+                                outcomeTitle: "Passing the Torch to a New Generation",
+                                outcomeText: "Your savings and apprentice mentoring allow you to survive the final decade with dignity and respect."
+                            }
+                        ]
+                    }
+                ],
+
+                // Endings
+                endings: {
+                    fail_health: {
+                        badge: "DEFEAT • CONSUMED BY THE MACHINES",
+                        title: "Collapsed in the Industrial Slum",
+                        desc: "Like countless unnamed proletarians of the 19th century, malnutrition, unguarded machinery, and slum diseases destroyed your body before reform could save you. Industrial progress was built upon the lives of workers like you."
+                    },
+                    fail_exhaustion: {
+                        badge: "DEFEAT • WORKED TO DEATH",
+                        title: "Broken by 16-Hour Shifts",
+                        desc: "Years of relentless 12-to-16-hour shifts under strict factory overseers drained every ounce of your strength. Without rest or medical care, you collapsed beside the machines."
+                    },
+                    fail_poverty: {
+                        badge: "DEFEAT • DESTITUTION & THE WORKHOUSE",
+                        title: "Trapped in Generational Poverty",
+                        desc: "You survived the machines across seven decades, but ended with fewer than $32. Without savings or pension, old age forces your family into the dreaded Victorian workhouse while capitalists dine in luxury."
+                    },
+                    fail_rights: {
+                        badge: "PARTIAL SURVIVAL • POWERLESS & EXPLOITED",
+                        title: "Alone Against the Capitalists",
+                        desc: "You saved enough dollars to survive, but avoided the labour movement (Worker Rights < 70%). Without strong trade unions or political voice, your children remain at the mercy of factory owners."
+                    },
+                    win_reformer: {
+                        badge: "HISTORICAL VICTORY • CHAMPION OF THE PROLETARIAT",
+                        title: "Survived & Forged the Labour Movement!",
+                        desc: "Against crushing odds across the Ages of Steam and Electricity, you survived the harshest decades of the Industrial Revolution, escaped slum poverty, AND helped win the Factory Acts, the 1871 Trade Union Act, and working-class political rights!"
+                    }
+                }
+            },
+
+            zh: {
+                headerTitle: "血汗與鋼鐵",
+                headerSub: "英國，1760年代–1890年代 • 工人階級生存模擬遊戲",
+                btnArchive: "課本史料筆記",
+                langBtn: "English",
+                footerSource: "資料來源：齡記歷史科課題5《工業革命》（第40–66頁）",
+                footerMode: "全班離線單機版 • 共7個回合 • 真實殘酷難度",
+                modalTitle: "課本歷史重點參考（第40–66頁）",
+                modalClose: "返回遊戲",
+
+                // Intro Screen
+                introBadge: "歷史角色扮演模擬",
+                introTitle: "你能否在「機器時代」存活下來？",
+                introDesc: "你原本是英國農村的農民，但17至18世紀的「圈地運動」奪走了你的耕地。你被迫湧入曼徹斯特等新興工業城市尋找生計，成為受僱於資本家的「無產階級」（工人階級）。你必須在1760年代至1890年代的7個歷史階段（回合）中掙扎求存。",
+                winTitle: "嚴苛的勝利條件（第7回合結束時）：",
+                winCond1: "1. 存活下來：健康值 > 0 且 過勞度 < 100。",
+                winCond2: "2. 擺脫赤貧：在微薄工資與高昂租金下，累積至少 $32 儲蓄。",
+                winCond3: "3. 爭取勞工尊嚴：工人團結與權益值達到 70% 或以上。",
+                hudGoalReminder: "勝利目標：❤️>0 • ⛓️<100 • 💵≥$32 • ✊≥70%",
+                warningNote: "歷史提示：工業資產階級支付的工資僅夠糊口。盲目加班會導致過勞病死；但若在缺乏組織下過早反抗，則會遭到無情鎮壓。",
+                startBtn: "踏入工廠大門（開始第1回合）",
+
+                // HUD Labels
+                roundLabel: "第",
+                ofLabel: "回合（共7回合）",
+                statHealth: "健康",
+                statWealth: "積蓄",
+                statRights: "權益",
+                statExhaustion: "過勞",
+                unitDollar: "$",
+                impactPrefix: "預期影響：",
+                dailyScheduleTitle: "工人每日作息（課本第61頁）",
+                dailyScheduleText: "06:00–18:30+（每日12–16小時）",
+                nextRoundBtn: "進入下一個歷史時期 →",
+                finalResultBtn: "查看你的歷史結局 →",
+                playAgainBtn: "重新挑戰",
+                primarySourceLabel: "課本連結",
+                consequenceLabel: "你的抉擇帶來的後果",
+                tabFateLabel: "1. 歷史結局",
+                tabReflectLabel: "2. 課本反思連結",
+
+                // Reflective Textbook Debrief (End Screen)
+                reflectionBadge: "歷史反思與課本知識連結",
+                reflectionTitle: "從遊戲體驗回顧工業革命歷史（課本第44–66頁）",
+                reflectionPoints: [
+                    {
+                        concept: "1. 貧富懸殊與階級對立（課本第59、64–65頁）",
+                        detail: "你在遊戲中親身體會到要存下 $32 是何等艱難。在工廠制度下，「工業資產階級」憑藉鐵路運輸、機器大規模生產與海外貿易累積鉅額財富，過著奢華生活；而「工人階級（無產階級）」每天勞動12至16小時，工資卻僅夠勉強糊口。"
+                    },
+                    {
+                        concept: "2. 惡劣環境與童工悲歌（課本第60–62頁）",
+                        detail: "單靠個人拼命加班只會令健康惡化、過勞度飆升。貧民窟缺乏排污系統與清潔食水，導致霍亂等傳染病流行；許多家庭更被迫讓年幼子女進入工廠或煤礦當童工，領取僅為成人三分之一的微薄工資。"
+                    },
+                    {
+                        concept: "3. 集體團結、參政權與立法改革（課本第62–63、66頁）",
+                        detail: "正如遊戲要求「勞工權益 ≥ 70%」才能真正獲勝，歷史上的英國工人亦無法單憑一己之力對抗剝削。工人透過組織工會、發起「憲章運動」（1838–1858年）以及社會主義思潮的推動，最終迫使英國政府頒布多條《工廠法》限制工時、於1871年允許工會合法化，並逐步讓男性工人取得投票權。"
+                    }
+                ],
+                reflectionQuestionTitle: "課堂價值反思問題（參考課本第56頁及第62頁）：",
+                reflectionQuestion: "親身經歷了19世紀工人橫跨「蒸汽時代」與「電力時代」的艱苦處境後，你認為工業革命帶來的科技與經濟成就，能否抵銷工人階級所付出的沉重代價？為什麼？",
+
+                // Textbook Archive Modal Content
+                archiveSections: [
+                    {
+                        title: "1. 為何始於英國？圈地運動與都市化（第41–43, 58頁）",
+                        body: "英國貴族和地主進行「圈地運動」，圈佔農民土地合併成大牧場以供應羊毛。大批失去耕地的農民湧入煤礦附近的工業城市（如曼徹斯特、利物浦），為工廠提供了充足而廉價的勞動力。"
+                    },
+                    {
+                        title: "2. 機械化、蒸汽動力與電力時代（第44–49頁）",
+                        body: "1764年「珍妮紡紗機」發明，標誌工業革命正式開始。1769年瓦特改良蒸汽機，使工廠可建於城市。1879年美國人愛迪生發明較耐用的電燈泡，人們開始進入「電力時代」，工業生產規模持續擴大。"
+                    },
+                    {
+                        title: "3. 交通與通訊的革新（第50–52頁）",
+                        body: "英國開鑿運河（1761年起）並建立鐵路網絡——1830年斯提芬遜製造蒸汽機車「火箭號」，建成曼徹斯特至利物浦鐵路，使倫敦往曼徹斯特的車程由馬車5天縮短至火車8小時。電報與電話亦大幅加快資訊傳播。"
+                    },
+                    {
+                        title: "4. 無產階級的困苦生活與童工問題（第59–62頁）",
+                        body: "工人每天工作12至16小時，居住在沒有完善排水系統和清潔食水的貧民窟，傳染病流行。工廠大量聘用工資僅為成人三分之一的童工鑽進機器底下清理雜物或在礦道搬煤，常遭監工用皮帶或棍子抽打。"
+                    },
+                    {
+                        title: "5. 工會、工廠法、社會主義與選舉權（第62–66頁）",
+                        body: "工人組織工會並發起「憲章運動」（1838–1858年），爭取減少工時、提高工資和普選權。英國通過《工廠法》（1833、1844、1847年），於1871年允許工會合法化，並逐步擴大男性工人投票權；馬克思等人則提出「社會主義」理論。"
+                    }
+                ],
+
+                // 7 Historical Rounds
+                rounds: [
+                    {
+                        era: "第1回合 • 1760年代–1780年代",
+                        title: "離鄉入城：珍妮紡紗機與蒸汽動力",
+                        context: "「圈地運動」令你喪失了祖輩耕種的土地，而「家庭手工業」亦無法與珍妮紡紗機（1764年）及瓦特改良的蒸汽機（1769年）競爭。你湧入曼徹斯特，在一間新式蒸汽棉紡織廠找到工作。",
+                        dilemma: "廠主在嚴格的「分工」制度下開出條件：在毫無安全防護的機器旁每天工作14小時，週薪僅 $9，而貧民窟租金與粗麵包已需花費 $7。",
+                        sourceNote: "課本第42、44、48、56頁：工廠集中大量工人使用蒸汽推動的大型機器進行分工生產，取代了緩慢的家庭手工業。",
+                        choices: [
+                            {
+                                title: "接受14小時長工時，入住擁擠的貧民窟",
+                                desc: "與另外兩個家庭同住陰暗潮濕的地下室，節衣縮食以儲蓄每一塊錢。",
+                                req: null,
+                                effects: { health: -14, wealth: +5, rights: 0, exhaustion: +18 },
+                                outcomeTitle: "貧民窟中的疲憊求生",
+                                outcomeText: "你從清晨06:00工作至晚上20:00，午餐僅有45分鐘。屋內沒有排水系統和乾淨食水，棉絮令你咳嗽不止，但你勉強存下了 $5。"
+                            },
+                            {
+                                title: "租住較清潔的閣樓，維持12小時標準工時",
+                                desc: "將幾乎全部工資用於改善居住環境與膳食，保住身體健康。",
+                                req: null,
+                                effects: { health: -5, wealth: +2, rights: +5, exhaustion: +10 },
+                                outcomeTitle: "勉強糊口，積蓄微薄",
+                                outcomeText: "你的身體比鄰居硬朗，傍晚亦有一點時間與其他紡紗工交談，但積蓄增長十分緩慢。"
+                            },
+                            {
+                                title: "與憤怒的手織工一起衝進工廠搗毀機器",
+                                desc: "直接反抗奪去農民與手工業者生計的動力織布機。",
+                                req: null,
+                                effects: { health: -22, wealth: -4, rights: +10, exhaustion: +14 },
+                                outcomeTitle: "遭到廠方武裝人員殘酷鎮壓",
+                                outcomeText: "英國政府立法保障發明者專利權及資本家財產。武裝警衛將你毒打一頓，扣除工資並將你列入黑名單數週。"
+                            }
+                        ]
+                    },
+                    {
+                        era: "第2回合 • 1810年代–1820年代",
+                        title: "家庭生計危機與童工問題",
+                        context: "工廠制度已擴展至英國北部各煤礦城市。物價飛漲，但工業資產階級為降低成本而壓低成人男工工資。你10歲的孩子無法上學，家庭正面臨斷糧危機。",
+                        dilemma: "紡織廠監工提出僱用你10歲的孩子，讓他鑽進運作中的自動精紡機底下清除雜物——工資僅為成人的三分之一。",
+                        sourceNote: "課本第62頁：童工每天工作十多小時，工資僅為成人三分之一，常遭監工用皮帶或棍子抽打，易患脊椎側彎及耳聾。",
+                        choices: [
+                            {
+                                title: "忍痛讓10歲的孩子進入紡織廠當童工",
+                                desc: "家庭迫切需要這筆額外收入，否則全家都會餓死。",
+                                req: null,
+                                effects: { health: -10, wealth: +8, rights: -5, exhaustion: +12 },
+                                outcomeTitle: "父母的心碎抉擇",
+                                outcomeText: "微薄的童工薪水讓全家勉強溫飽，但孩子回家時身上滿是監工皮帶抽打的傷痕，聽力受損且脊椎開始彎曲。"
+                            },
+                            {
+                                title: "拒絕讓孩子做童工，自己兼職危險的煤礦夜班",
+                                desc: "獨力承擔生計，下班後再到礦坑搬運供應蒸汽機的煤炭。",
+                                req: null,
+                                effects: { health: -20, wealth: +5, rights: +5, exhaustion: +22 },
+                                outcomeTitle: "肺部受損與過度勞累",
+                                outcomeText: "孩子免受工廠機器摧殘，但你在狹窄礦道吸入大量煤灰，肺部嚴重受損，身體接近崩潰邊緣。"
+                            },
+                            {
+                                title: "秘密參加地下工會組織聚會",
+                                desc: "當時工會仍受到嚴厲限制，工人們秘密集會籌集互助金，商討爭取合理待遇。",
+                                req: null,
+                                effects: { health: -8, wealth: -2, rights: +16, exhaustion: +10 },
+                                outcomeTitle: "無產階級團結的萌芽",
+                                outcomeText: "你繳納了 $2 秘密會費。雖然生活依然拮据，但你與工友建立了深厚的團結意識，準備對抗資本家的剝削。"
+                            }
+                        ]
+                    },
+                    {
+                        era: "第3回合 • 1825–1830年",
+                        title: "蒸汽機車與鐵路網絡時代",
+                        context: "燒煤煉鋼技術成熟，英國邁入鐵路時代！1825年英國建成第一條蒸汽火車鐵路；1830年斯提芬遜製造蒸汽機車「火箭號」，建成曼徹斯特至利物浦鐵路，使倫敦往曼徹斯特的車程由馬車5天大幅縮短至火車8小時。",
+                        dilemma: "鐵路承建商急聘築路工人開鑿隧道與鋪設鐵軌，同時工廠主亦強迫工人加快生產以趕上火車貨運。",
+                        sourceNote: "課本第49–51、58頁：煉鋼技術成熟；斯提芬遜製造「火箭號」（1830年），鐵路網絡連接各煤礦工業城市。",
+                        choices: [
+                            {
+                                title: "受僱為鐵路築路工，鋪設曼徹斯特至利物浦鐵路",
+                                desc: "開山爆破與搬運沉重鐵軌極度危險，但工資比紡織廠高出一截。",
+                                req: null,
+                                effects: { health: -16, wealth: +9, rights: +4, exhaustion: +18 },
+                                outcomeTitle: "鐵軌旁的血汗代價",
+                                outcomeText: "爆破事故與塌方令不少築路工傷亡，但你憑藉體力熬了下來，賺取了 $9 血汗錢，見證「火箭號」蒸汽機車呼嘯而過。"
+                            },
+                            {
+                                title: "串連運河與鐵路貨運工人，要求改善安全保障",
+                                desc: "聯合運輸工人與廠工，爭取工傷賠償與合理休息時間。",
+                                req: null,
+                                effects: { health: -6, wealth: +1, rights: +14, exhaustion: +10 },
+                                outcomeTitle: "鐵路連接城市，團結連接工人",
+                                outcomeText: "正如鐵路打破了內陸與港口城市的地理界限，你的奔走將曼徹斯特與利物浦的工人緊密聯繫在一起。"
+                            },
+                            {
+                                title: "婉拒額外加班，花錢修補漏雨的貧民窟屋頂",
+                                desc: "趁寒冬來臨前休養生息，修補簡陋房屋以防風寒。",
+                                req: { stat: 'wealth', val: 4, label: "需要 $4 積蓄" },
+                                effects: { health: +12, wealth: -4, rights: 0, exhaustion: -16 },
+                                outcomeTitle: "難得的喘息與康復",
+                                outcomeText: "你花費 $4 購買食物與修補屋頂，疲憊不堪的身體終於獲得寶貴的恢復。"
+                            }
+                        ]
+                    },
+                    {
+                        era: "第4回合 • 1833年",
+                        title: "貧民窟瘟疫與《1833年工廠法》",
+                        context: "急速的都市化使工業城市人口暴增，貧民窟缺乏排污系統，霍亂與天花等傳染病肆虐！同時，英國國會正就工廠惡劣待遇辯論《1833年工廠法》。",
+                        dilemma: "你居住的狹窄街道爆發嚴重疫症，與此同時，廠主為趕製經由鐵路運往港口的海外訂單，強迫工人無償加班。",
+                        sourceNote: "課本第53、62–63頁：貧民窟傳染病流行；疫苗等醫學發明出現；《1833年工廠法》首次限制童工最高工時。",
+                        choices: [
+                            {
+                                title: "動用積蓄購買清潔食水與接種新式疫苗",
+                                desc: "花費 $6 購買潔淨食水、消毒石灰並接受預防傳染病的醫療接種。",
+                                req: { stat: 'wealth', val: 6, label: "需要 $6 積蓄" },
+                                effects: { health: +14, wealth: -6, rights: 0, exhaustion: -6 },
+                                outcomeTitle: "衛生與醫學進步救了你一命",
+                                outcomeText: "霍亂席捲整條貧民窟街道，許多鄰居不幸病逝，但你對清潔食水與新醫學的投資保住了性命。"
+                            },
+                            {
+                                title: "冒著染病風險接受廠主加班，賺取微薄獎金",
+                                desc: "不顧疫症威脅，每天工作16小時以換取廠主的額外賞錢。",
+                                req: null,
+                                effects: { health: -22, wealth: +7, rights: -5, exhaustion: +20 },
+                                outcomeTitle: "潮濕小屋中的高燒",
+                                outcomeText: "你賺到了 $7，但受污染的食水令你染上嚴重熱病，每天只能拖著虛弱的身軀在織布機前掙扎。"
+                            },
+                            {
+                                title: "向國會調查員作證，揭發工廠虐待童工",
+                                desc: "冒著被解僱的風險，向政府巡視員舉報工廠強迫兒童每天工作14小時。",
+                                req: null,
+                                effects: { health: -7, wealth: -1, rights: +16, exhaustion: +7 },
+                                outcomeTitle: "推動《1833年工廠法》通過",
+                                outcomeText: "你的證詞促成《1833年工廠法》通過，規定9至13歲童工每日工時不超過9小時！廠主憤而扣減你的獎金，但工友們敬佩你的勇氣。"
+                            }
+                        ]
+                    },
+                    {
+                        era: "第5回合 • 1838–1848年",
+                        title: "憲章運動與「飢餓的四〇年代」",
+                        context: "工業資產階級憑藉海外殖民貿易與鐵路網累積鉅額財富，過著奢華生活；工人卻沒有國會投票權。1838至1858年間，英國工人發起「憲章運動」，要求減少工時、提高工資和普選權。",
+                        dilemma: "數以萬計的工人在荒原舉行憲章運動大型集會並發動罷工，此時國會亦正在審議《1844年工廠法》及《1847年工廠法》。",
+                        sourceNote: "課本第63–65頁：英國工人發起憲章運動（1838–1858年），並促成《1844年》及《1847年工廠法》（限制工時至10小時）。",
+                        choices: [
+                            {
+                                title: "參加憲章運動集會並參與全廠罷工",
+                                desc: "放棄一週工資，走上街頭爭取《人民憲章》與十小時工作制。",
+                                req: null,
+                                effects: { health: -9, wealth: -5, rights: +20, exhaustion: +5 },
+                                outcomeTitle: "促成《1847年工廠法》限制10小時工時",
+                                outcomeText: "雖然憲章運動最終以失敗告終，但龐大的工人壓力迫使政府通過《1844年》及《1847年工廠法》，將女工及14–18歲工人工時降至10小時！"
+                            },
+                            {
+                                title: "無視罷工糾察線，替廠主加班賺取雙倍工資",
+                                desc: "趁工友罷工期間頂替崗位，領取資本家開出的雙倍報酬。",
+                                req: null,
+                                effects: { health: -14, wealth: +12, rights: -22, exhaustion: +18 },
+                                outcomeTitle: "沉甸甸的鈔票，孤立的背叛者",
+                                outcomeText: "你賺取了 $12，但整條街的工友都視你為出賣工人階級的叛徒，徹底與你斷絕往來。"
+                            },
+                            {
+                                title: "組織工人消費合作社與罷工互助基金",
+                                desc: "運用你在工友間的聲望，集資批發麵粉接濟罷工家庭。",
+                                req: { stat: 'rights', val: 25, label: "需要 25% 勞工權益" },
+                                effects: { health: +6, wealth: +3, rights: +14, exhaustion: +4 },
+                                outcomeTitle: "團結互助的力量",
+                                outcomeText: "互助基金讓罷工家庭免於飢餓，證明了有組織的工人階級能夠抵禦資本家的經濟封鎖。"
+                            }
+                        ]
+                    },
+                    {
+                        era: "第6回合 • 1851–1871年",
+                        title: "萬國博覽會、社會主義與工會合法化",
+                        context: "1851年倫敦萬國工業博覽會展出了逾十萬種工業新產品，標誌英國工業化基本完成。同時，德國思想家馬克思等人提出「社會主義」理論，英國工人亦迎來爭取《1871年工會法》的關鍵時刻。",
+                        dilemma: "數十年的工業勞動已令你滿身傷病。面對社會主義思潮與工會合法化浪潮，你將作何抉擇？",
+                        sourceNote: "課本第49、63、66頁：1851年萬國博覽會；社會主義（馬克思）興起；英國最終於1871年允許工會合法化。",
+                        choices: [
+                            {
+                                title: "領導工人運動爭取《1871年工會法》通過",
+                                desc: "聯合技術工人與紡織工人，為工會贏得永久合法地位與集體談判權。",
+                                req: { stat: 'rights', val: 35, label: "需要 35% 勞工權益" },
+                                effects: { health: -5, wealth: +6, rights: +18, exhaustion: +7 },
+                                outcomeTitle: "1871年：英國正式允許工會合法化！",
+                                outcomeText: "英國國會最終於1871年允許工會合法化！集體談判權為工業城市的工人贏得了安全保障與更穩定的生活工資。"
+                            },
+                            {
+                                title: "轉任技術較高的機器維修技工",
+                                desc: "憑藉多年操作經驗，轉往機器製造與維修部門獲取穩定高薪。",
+                                req: { stat: 'health', val: 30, label: "需要 30% 健康狀況" },
+                                effects: { health: -7, wealth: +10, rights: +4, exhaustion: +10 },
+                                outcomeTitle: "用機器製造機器的時代",
+                                outcomeText: "隨著英國機器製造業興起，你的技術為你帶來較高工資，並遠離了最惡劣的紡紗車間粉塵。"
+                            },
+                            {
+                                title: "拖著殘軀在工廠生產線上繼續苦撐",
+                                desc: "透支體力在流水線上加班，只為多存幾塊錢應付晚年。",
+                                req: null,
+                                effects: { health: -18, wealth: +8, rights: 0, exhaustion: +20 },
+                                outcomeTitle: "奉獻給機器的悲苦歲月",
+                                outcomeText: "你從無情的機器旁榨出了幾塊錢，卻付出了身體進一步受損的沉重代價。"
+                            }
+                        ]
+                    },
+                    {
+                        era: "第7回合 • 1879–1890年代",
+                        title: "電力時代的來臨與工人參政權",
+                        context: "1879年美國人愛迪生發明較耐用的電燈泡，人類邁入「電力時代」，電報與電話亦普及全球。電燈照亮了工廠車間使夜班延長，同時英國男性工人已逐步取得國會投票權，為支持工人的政黨奠定基礎。",
+                        dilemma: "在這最後的關鍵時代，電燈令工廠日夜不停運作，而你的工會亦準備運用手中的選票改變英國政治。",
+                        sourceNote: "課本第44、52、62–63頁：電力時代（愛迪生，1879年）；男性工人取得投票權，推動支持工人的政治改革。",
+                        choices: [
+                            {
+                                title: "發動取得投票權的男性工人，推舉勞工代表進入議會",
+                                desc: "結合合法工會與選舉權，迫使政府立法改善貧民窟住屋與老年保障。",
+                                req: { stat: 'rights', val: 40, label: "需要 40% 勞工權益" },
+                                effects: { health: -4, wealth: +6, rights: +18, exhaustion: +6 },
+                                outcomeTitle: "工人階級終於在議會擁有聲音！",
+                                outcomeText: "憑藉合法工會與手中選票，你們推動了公共衛生與勞工福利立法，為自己的晚年贏得尊嚴與保障！"
+                            },
+                            {
+                                title: "進入新興電力工廠，在電燈照明下趕工夜班",
+                                desc: "電燈泡讓工廠得以通宵生產，你在新興電力工業賺取較高夜班工資。",
+                                req: null,
+                                effects: { health: -14, wealth: +11, rights: +3, exhaustion: +16 },
+                                outcomeTitle: "電燈照耀下的不眠夜",
+                                outcomeText: "愛迪生的電燈泡打破了日夜界限。你在電力工業賺取了 $11，但日夜顛倒的輪班令年邁的身體疲憊不堪。"
+                            },
+                            {
+                                title: "憑積蓄半退休，在工會夜校指導年輕學徒",
+                                desc: "退下最繁重的生產線，向新一代工人傳授機器安全與團結抗爭的經驗。",
+                                req: { stat: 'wealth', val: 20, label: "需要 $20 積蓄" },
+                                effects: { health: +10, wealth: +5, rights: +12, exhaustion: -12 },
+                                outcomeTitle: "薪火相傳的工人導師",
+                                outcomeText: "你的積蓄與工會津貼讓你得以安享晚年，並將爭取勞工權益的火種傳給下一代。"
+                            }
+                        ]
+                    }
+                ],
+
+                // Endings
+                endings: {
+                    fail_health: {
+                        badge: "挑戰失敗 • 被機器吞噬的生命",
+                        title: "倒斃於工業貧民窟中",
+                        desc: "正如19世紀無數無名無產階級的命運，營養不良、缺乏安全設備的機器與貧民窟傳染病摧毀了你的身體。工業革命的輝煌成就，正是建立在無數工人的血汗與生命之上。"
+                    },
+                    fail_exhaustion: {
+                        badge: "挑戰失敗 • 過勞致死",
+                        title: "被16小時長工時徹底壓垮",
+                        desc: "長年累月在廠方監工嚴厲監視下每天勞動12至16小時，耗盡了你最後一絲精力。在缺乏休息與醫療保障下，你最終倒在了機器旁。"
+                    },
+                    fail_poverty: {
+                        badge: "挑戰失敗 • 赤貧與濟貧院",
+                        title: "無法擺脫的世代貧困",
+                        desc: "你雖然熬過了七十年的工業風浪，但最終積蓄不足 $32。在沒有退休保障的年代，年邁的你與家人被迫送入悲慘的維多利亞時代「濟貧院」，而工業資產階級依然在豪宅中舉行盛宴。"
+                    },
+                    fail_rights: {
+                        badge: "勉強存活 • 孤立無援的順民",
+                        title: "獨善其身，卻未能改變剝削",
+                        desc: "你存夠了勉強糊口的積蓄，但因為迴避工人運動（勞工權益 < 70%），缺乏強大工會與政治話語權的你與子孫，依然難以擺脫資本家的剝削。"
+                    },
+                    win_reformer: {
+                        badge: "歷史性勝利 • 無產階級的先驅",
+                        title: "橫跨蒸汽與電力時代，推動勞工改革！",
+                        desc: "在極端惡劣的剝削環境下，你不僅頑強地活過了七個歷史階段、擺脫了貧民窟赤貧，更與工友並肩推動了《工廠法》、1871年工會合法化與工人參政權！你的抗爭證明了工人階級有力量塑造更公平的現代社會。"
+                    }
+                }
+            }
+        };
+
+        /**
+         * ============================================================================
+         * CORE GAME LOGIC & RENDERING
+         * ============================================================================
+         */
+        function t() {
+            return CONTENT[currentLang];
+        }
+
+        function switchLanguage() {
+            currentLang = currentLang === 'en' ? 'zh' : 'en';
+            updateStaticUI();
+            render();
+        }
+
+        function updateStaticUI() {
+            const langData = t();
+            document.getElementById('ui-header-title').textContent = langData.headerTitle;
+            document.getElementById('ui-header-sub').textContent = langData.headerSub;
+            document.getElementById('ui-btn-archive').textContent = langData.btnArchive;
+            document.getElementById('ui-lang-label').textContent = langData.langBtn;
+            document.getElementById('ui-modal-title').textContent = langData.modalTitle;
+            document.getElementById('ui-modal-close').textContent = langData.modalClose;
+
+            // Populate Textbook Archive Modal
+            const archiveContainer = document.getElementById('archive-content');
+            archiveContainer.innerHTML = langData.archiveSections.map(sec => `
+                <div class="p-3.5 rounded-lg bg-stone-900/80 border border-stone-700/80">
+                    <h3 class="font-bold text-amber-400 mb-1">${sec.title}</h3>
+                    <p class="text-stone-300 text-xs sm:text-sm">${sec.body}</p>
+                </div>
+            `).join('');
+        }
+
+        function toggleArchiveModal(show) {
+            const modal = document.getElementById('archive-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function startGame() {
+            state = {
+                screen: 'play',
+                endTab: 'summary',
+                round: 0,
+                health: 75,
+                wealth: 8,
+                rights: 10,
+                exhaustion: 15,
+                lastOutcome: null,
+                historyLog: [],
+                victoryType: null
+            };
+            render();
+        }
+
+        function setEndTab(tabName) {
+            state.endTab = tabName;
+            render();
+        }
+
+        function clamp(val, min, max) {
+            return Math.max(min, Math.min(max, val));
+        }
+
+        function makeChoice(choiceIndex) {
+            const currentRoundData = t().rounds[state.round];
+            const choice = currentRoundData.choices[choiceIndex];
+
+            // Verify requirement if present
+            if (choice.req && state[choice.req.stat] < choice.req.val) {
+                return;
+            }
+
+            // Apply stat deltas
+            state.health = clamp(state.health + choice.effects.health, 0, 100);
+            state.wealth = Math.max(0, state.wealth + choice.effects.wealth);
+            state.rights = clamp(state.rights + choice.effects.rights, 0, 100);
+            state.exhaustion = clamp(state.exhaustion + choice.effects.exhaustion, 0, 100);
+
+            state.lastOutcome = {
+                choiceIndex: choiceIndex,
+                effects: choice.effects
+            };
+
+            state.historyLog.push({
+                round: state.round + 1,
+                choiceIndex: choiceIndex
+            });
+
+            // Trigger screen shake if severe health loss or exhaustion spike
+            if (choice.effects.health <= -15 || choice.effects.exhaustion >= 20) {
+                const root = document.getElementById('game-root');
+                root.classList.remove('shake-effect');
+                void root.offsetWidth;
+                root.classList.add('shake-effect');
+            }
+
+            // Check immediate fatal conditions (Health <= 0 or Exhaustion >= 100)
+            if (state.health <= 0) {
+                state.victoryType = 'fail_health';
+                state.screen = 'end';
+            } else if (state.exhaustion >= 100) {
+                state.victoryType = 'fail_exhaustion';
+                state.screen = 'end';
+            } else {
+                state.screen = 'outcome';
+            }
+
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function advanceRound() {
+            if (state.round < 6) {
+                state.round += 1;
+                state.screen = 'play';
+            } else {
+                // Evaluate End of Round 7 Victory / Defeat Conditions (Harsh Historical Realism)
+                if (state.health <= 0) {
+                    state.victoryType = 'fail_health';
+                } else if (state.exhaustion >= 100) {
+                    state.victoryType = 'fail_exhaustion';
+                } else if (state.wealth < 32) {
+                    state.victoryType = 'fail_poverty';
+                } else if (state.rights < 70) {
+                    state.victoryType = 'fail_rights';
+                } else {
+                    state.victoryType = 'win_reformer';
+                }
+                state.screen = 'end';
+            }
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderStatHUD() {
+            const langData = t();
+            const healthColor = state.health > 50 ? 'bg-emerald-500' : state.health > 25 ? 'bg-amber-500' : 'bg-red-600';
+            const exhaustColor = state.exhaustion < 50 ? 'bg-sky-500' : state.exhaustion < 80 ? 'bg-amber-500' : 'bg-red-600';
+            const wealthColor = state.wealth >= 32 ? 'bg-amber-400' : 'bg-amber-600';
+            const rightsColor = state.rights >= 70 ? 'bg-indigo-400' : 'bg-indigo-600';
+
+            return `
+                <div class="sticky top-1 z-20 victorian-card rounded-xl p-2 sm:p-3 mb-2 sm:mb-2.5 bg-stone-950/95 backdrop-blur-md">
+                    <!-- Top Row: Round Badge & Full Wrapping Win Goal Reminder (Zero Truncation on Mobile) -->
+                    <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 pb-1.5 mb-1.5 border-b border-stone-700/80">
+                        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 w-full sm:w-auto">
+                            <span class="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-[10px] sm:text-xs tracking-wider shrink-0">
+                                ${langData.roundLabel} ${state.round + 1}/7
+                            </span>
+                            <span class="text-[11px] sm:text-xs font-semibold text-amber-300 leading-tight break-words">🏆 ${langData.hudGoalReminder}</span>
+                        </div>
+                        <div class="hidden md:flex text-xs text-stone-400 items-center gap-1 shrink-0">
+                            <span>${langData.dailyScheduleText}</span>
+                        </div>
+                    </div>
+
+                    <!-- Compact 4-Column Stat Strip on All Screens -->
+                    <div class="grid grid-cols-4 gap-1.5 sm:gap-2.5">
+                        <!-- Health -->
+                        <div class="bg-stone-900/90 px-1.5 py-1 sm:p-2 rounded-lg border border-stone-800">
+                            <div class="flex justify-between items-center text-[10px] sm:text-xs mb-0.5">
+                                <span class="text-stone-400 font-medium truncate">❤️<span class="hidden xs:inline"> ${langData.statHealth}</span></span>
+                                <span class="font-bold ${state.health <= 25 ? 'text-red-400' : 'text-stone-200'}">${state.health}</span>
+                            </div>
+                            <div class="w-full h-1 sm:h-1.5 bg-stone-800 rounded-full overflow-hidden">
+                                <div class="stat-bar h-full ${healthColor}" style="width: ${state.health}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Exhaustion -->
+                        <div class="bg-stone-900/90 px-1.5 py-1 sm:p-2 rounded-lg border border-stone-800">
+                            <div class="flex justify-between items-center text-[10px] sm:text-xs mb-0.5">
+                                <span class="text-stone-400 font-medium truncate">⛓️<span class="hidden xs:inline"> ${langData.statExhaustion}</span></span>
+                                <span class="font-bold ${state.exhaustion >= 80 ? 'text-red-400' : 'text-stone-200'}">${state.exhaustion}</span>
+                            </div>
+                            <div class="w-full h-1 sm:h-1.5 bg-stone-800 rounded-full overflow-hidden">
+                                <div class="stat-bar h-full ${exhaustColor}" style="width: ${state.exhaustion}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Savings (Goal >= $32) -->
+                        <div class="bg-stone-900/90 px-1.5 py-1 sm:p-2 rounded-lg border border-stone-800">
+                            <div class="flex justify-between items-center text-[10px] sm:text-xs mb-0.5">
+                                <span class="text-stone-400 font-medium truncate">💵<span class="hidden xs:inline"> ${langData.statWealth}</span></span>
+                                <span class="font-bold ${state.wealth >= 32 ? 'text-amber-300' : 'text-stone-200'}">$${state.wealth}/32</span>
+                            </div>
+                            <div class="w-full h-1 sm:h-1.5 bg-stone-800 rounded-full overflow-hidden">
+                                <div class="stat-bar h-full ${wealthColor}" style="width: ${Math.min(100, (state.wealth / 32) * 100)}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Worker Rights (Goal >= 70%) -->
+                        <div class="bg-stone-900/90 px-1.5 py-1 sm:p-2 rounded-lg border border-stone-800">
+                            <div class="flex justify-between items-center text-[10px] sm:text-xs mb-0.5">
+                                <span class="text-stone-400 font-medium truncate">✊<span class="hidden xs:inline"> ${langData.statRights}</span></span>
+                                <span class="font-bold ${state.rights >= 70 ? 'text-indigo-300' : 'text-stone-200'}">${state.rights}/70%</span>
+                            </div>
+                            <div class="w-full h-1 sm:h-1.5 bg-stone-800 rounded-full overflow-hidden">
+                                <div class="stat-bar h-full ${rightsColor}" style="width: ${Math.min(100, (state.rights / 70) * 100)}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatDeltaBadge(label, val, unit = '', inverse = false, compact = false, prefixUnit = false) {
+            if (val === 0) return '';
+            const isPositive = inverse ? val < 0 : val > 0;
+            const sign = val > 0 ? '+' : '-';
+            const absVal = Math.abs(val);
+            const formattedVal = prefixUnit ? `${sign}${unit}${absVal}` : `${sign}${absVal}${unit}`;
+            const colorClass = isPositive
+                ? 'bg-emerald-950/90 text-emerald-300 border-emerald-700/70'
+                : 'bg-red-950/90 text-red-300 border-red-700/70';
+            const paddingClass = compact ? 'px-1.5 py-0.5 text-[10px] sm:text-xs' : 'px-2 py-0.5 text-xs';
+            return `<span class="inline-flex items-center rounded border font-semibold ${paddingClass} ${colorClass}">${label} ${formattedVal}</span>`;
+        }
+
+        function renderChoiceEffectsPreview(effects) {
+            const langData = t();
+            return `
+                <div class="flex flex-wrap items-center gap-1 mt-1">
+                    ${formatDeltaBadge('❤️', effects.health, '', false, true, false)}
+                    ${formatDeltaBadge('💵', effects.wealth, langData.unitDollar, false, true, true)}
+                    ${formatDeltaBadge('⛓️', effects.exhaustion, '', true, true, false)}
+                    ${formatDeltaBadge('✊', effects.rights, '%', false, true, false)}
+                </div>
+            `;
+        }
+
+        function render() {
+            const root = document.getElementById('game-root');
+            const langData = t();
+
+            // 1. INTRO SCREEN (Compact Mobile Fit with Safe Scroll)
+            if (state.screen === 'intro') {
+                root.innerHTML = `
+                    <div class="victorian-card rounded-2xl p-4 sm:p-7 max-w-3xl w-full mx-auto flex flex-col justify-between">
+                        <div>
+                            <div class="inline-block px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-400 text-[10px] sm:text-xs font-bold tracking-wider mb-1.5">
+                                ${langData.introBadge}
+                            </div>
+                            <h2 class="font-display text-lg sm:text-3xl font-extrabold text-stone-100 mb-1.5 sm:mb-3 leading-tight">
+                                ${langData.introTitle}
+                            </h2>
+                            <p class="text-stone-300 text-xs sm:text-sm leading-snug sm:leading-relaxed mb-2.5 sm:mb-4">
+                                ${langData.introDesc}
+                            </p>
+                        </div>
+
+                        <!-- Compact SVG Industrial Skyline Illustration -->
+                        <div class="w-full h-16 sm:h-28 shrink-0 rounded-xl bg-gradient-to-b from-stone-900 to-amber-950/30 border border-stone-700/80 mb-2.5 sm:mb-4 overflow-hidden relative flex items-end">
+                            <svg class="w-full h-full" viewBox="0 0 800 160" preserveAspectRatio="none">
+                                <circle cx="140" cy="35" r="22" fill="#3f3a34" opacity="0.5"/>
+                                <circle cx="165" cy="25" r="28" fill="#4a443d" opacity="0.4"/>
+                                <circle cx="480" cy="30" r="25" fill="#3f3a34" opacity="0.5"/>
+                                <circle cx="510" cy="20" r="30" fill="#4a443d" opacity="0.35"/>
+                                <rect x="120" y="45" width="18" height="115" fill="#1c1915"/>
+                                <rect x="210" y="60" width="14" height="100" fill="#24201b"/>
+                                <rect x="465" y="40" width="20" height="120" fill="#1c1915"/>
+                                <rect x="640" y="55" width="16" height="105" fill="#24201b"/>
+                                <polygon points="60,160 60,105 110,80 110,105 160,80 160,105 210,80 210,160" fill="#29241e"/>
+                                <polygon points="380,160 380,95 440,70 440,95 500,70 500,95 560,70 560,160" fill="#211d18"/>
+                                <rect x="80" y="118" width="14" height="18" fill="#d97706" opacity="0.7"/>
+                                <rect x="130" y="118" width="14" height="18" fill="#d97706" opacity="0.5"/>
+                                <rect x="410" y="110" width="16" height="22" fill="#ea580c" opacity="0.75"/>
+                                <rect x="470" y="110" width="16" height="22" fill="#d97706" opacity="0.6"/>
+                                <rect x="250" y="135" width="95" height="18" rx="3" fill="#141210"/>
+                                <circle cx="270" cy="154" r="6" fill="#c8963e"/>
+                                <circle cx="295" cy="154" r="6" fill="#c8963e"/>
+                                <circle cx="325" cy="154" r="6" fill="#c8963e"/>
+                            </svg>
+                        </div>
+
+                        <div class="bg-stone-900/90 border border-amber-700/40 rounded-xl p-3 sm:p-4 mb-2.5 sm:mb-4">
+                            <h3 class="font-bold text-amber-400 text-xs sm:text-sm mb-1.5">${langData.winTitle}</h3>
+                            <ul class="space-y-1 text-[11px] sm:text-xs text-stone-200 leading-snug">
+                                <li>${langData.winCond1}</li>
+                                <li>${langData.winCond2}</li>
+                                <li>${langData.winCond3}</li>
+                            </ul>
+                            <p class="mt-2 pt-2 border-t border-stone-800 text-[10px] sm:text-xs text-red-300/90 italic leading-snug">
+                                ${langData.warningNote}
+                            </p>
+                        </div>
+
+                        <button onclick="startGame()" class="brass-btn shrink-0 w-full py-3 sm:py-3.5 px-5 rounded-xl text-sm sm:text-base tracking-wide cursor-pointer">
+                            ${langData.startBtn}
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // 2. PLAY SCREEN (DECISION PHASE — COMPACT & SCROLL-SAFE ON SMALL PHONES)
+            if (state.screen === 'play') {
+                const roundObj = langData.rounds[state.round];
+                root.innerHTML = `
+                    ${renderStatHUD()}
+                    <div class="victorian-card rounded-2xl p-3 sm:p-5 flex flex-col justify-between gap-2.5">
+                        <!-- Story & Dilemma Section -->
+                        <div class="mb-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-500 truncate">${roundObj.era}</span>
+                                <span class="text-[10px] text-stone-400 truncate max-w-[55%]">${roundObj.sourceNote.split('：')[0].split(':')[0]}</span>
+                            </div>
+                            <h2 class="font-display text-sm sm:text-xl font-bold text-stone-100 mt-0.5 mb-1 leading-snug">
+                                ${roundObj.title}
+                            </h2>
+                            <p class="text-stone-300 text-xs sm:text-sm leading-relaxed mb-2">
+                                ${roundObj.context}
+                            </p>
+                            <div class="px-2.5 py-2 rounded-lg bg-amber-950/40 border-l-2 sm:border-l-4 border-amber-500 text-stone-200 text-xs sm:text-sm font-medium leading-snug">
+                                ${roundObj.dilemma}
+                            </div>
+                        </div>
+
+                        <!-- 3 Choice Cards -->
+                        <div class="flex flex-col gap-2 sm:gap-2.5">
+                            ${roundObj.choices.map((c, idx) => {
+                                const isLocked = c.req && state[c.req.stat] < c.req.val;
+                                return `
+                                    <button onclick="makeChoice(${idx})" ${isLocked ? 'disabled' : ''} class="choice-btn w-full text-left px-3 py-2.5 sm:p-3.5 rounded-xl flex items-center justify-between gap-2">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex flex-wrap items-center gap-1 sm:gap-1.5">
+                                                <span class="font-bold text-amber-300 text-xs sm:text-sm leading-tight">${idx + 1}. ${c.title}</span>
+                                                ${c.req ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${isLocked ? 'bg-red-950 text-red-300 border border-red-700' : 'bg-emerald-950 text-emerald-300 border border-emerald-700'}">${c.req.label}</span>` : ''}
+                                            </div>
+                                            <p class="text-[11px] sm:text-xs text-stone-400 leading-snug mt-0.5">${c.desc}</p>
+                                            ${renderChoiceEffectsPreview(c.effects)}
+                                        </div>
+                                        <div class="shrink-0">
+                                            <span class="inline-flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-stone-800 border border-stone-600 text-amber-400 text-xs sm:text-sm font-bold">
+                                                →
+                                            </span>
+                                        </div>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // 3. OUTCOME SCREEN (CONSEQUENCE PHASE — SCROLL-SAFE)
+            if (state.screen === 'outcome') {
+                const roundObj = langData.rounds[state.round];
+                const chosen = roundObj.choices[state.lastOutcome.choiceIndex];
+                const eff = state.lastOutcome.effects;
+
+                root.innerHTML = `
+                    ${renderStatHUD()}
+                    <div class="victorian-card rounded-2xl p-4 sm:p-6 max-w-3xl w-full mx-auto flex flex-col justify-between gap-3">
+                        <div>
+                            <div class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-amber-500 mb-1">
+                                ${langData.consequenceLabel}
+                            </div>
+                            <h2 class="font-display text-lg sm:text-2xl font-bold text-stone-100 mb-2 sm:mb-3 leading-snug">
+                                ${chosen.outcomeTitle}
+                            </h2>
+                            <p class="text-stone-300 text-xs sm:text-base leading-relaxed mb-3 sm:mb-4">
+                                ${chosen.outcomeText}
+                            </p>
+
+                            <div class="flex flex-wrap gap-1.5 sm:gap-2 p-2.5 sm:p-3.5 rounded-xl bg-stone-900/90 border border-stone-700 mb-3">
+                                ${formatDeltaBadge('❤️ ' + langData.statHealth, eff.health, '', false, false, false)}
+                                ${formatDeltaBadge('⛓️ ' + langData.statExhaustion, eff.exhaustion, '', true, false, false)}
+                                ${formatDeltaBadge('💵 ' + langData.statWealth, eff.wealth, langData.unitDollar, false, false, true)}
+                                ${formatDeltaBadge('✊ ' + langData.statRights, eff.rights, '%', false, false, false)}
+                            </div>
+
+                            <div class="p-2.5 rounded-lg bg-stone-950/70 border border-stone-800 text-[11px] sm:text-xs text-stone-400 leading-snug">
+                                <span class="text-amber-400 font-bold mr-1">[${langData.primarySourceLabel}]</span>${roundObj.sourceNote}
+                            </div>
+                        </div>
+
+                        <button onclick="advanceRound()" class="brass-btn shrink-0 w-full py-3 sm:py-3.5 px-5 rounded-xl text-sm sm:text-base cursor-pointer mt-3">
+                            ${state.round < 6 ? langData.nextRoundBtn : langData.finalResultBtn}
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // 4. END SCREEN (TABBED VIEW: FATE SUMMARY vs TEXTBOOK REFLECTION — SCROLL-SAFE)
+            if (state.screen === 'end') {
+                const ending = langData.endings[state.victoryType];
+                const isWin = state.victoryType === 'win_reformer';
+
+                root.innerHTML = `
+                    <div class="victorian-card rounded-2xl p-3.5 sm:p-6 max-w-3xl w-full mx-auto flex flex-col justify-between border-2 ${isWin ? 'border-amber-500/70' : 'border-red-800/70'}">
+                        <!-- Top Tab Switcher -->
+                        <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-stone-950 border border-stone-800 mb-3">
+                            <button onclick="setEndTab('summary')" class="py-1.5 px-2 rounded-lg text-xs sm:text-sm font-bold transition ${state.endTab === 'summary' ? 'bg-amber-600 text-stone-950' : 'text-stone-400 hover:text-stone-200'}">
+                                ${langData.tabFateLabel}
+                            </button>
+                            <button onclick="setEndTab('reflection')" class="py-1.5 px-2 rounded-lg text-xs sm:text-sm font-bold transition ${state.endTab === 'reflection' ? 'bg-amber-600 text-stone-950' : 'text-stone-400 hover:text-stone-200'}">
+                                ${langData.tabReflectLabel}
+                            </button>
+                        </div>
+
+                        <!-- Tab 1: Final Fate & Stats -->
+                        ${state.endTab === 'summary' ? `
+                            <div class="flex flex-col justify-center">
+                                <div class="inline-block self-start px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold tracking-wider mb-2 ${isWin ? 'bg-emerald-950 text-emerald-300 border border-emerald-600' : 'bg-red-950 text-red-300 border border-red-700'}">
+                                    ${ending.badge}
+                                </div>
+                                <h2 class="font-display text-lg sm:text-2xl font-extrabold text-stone-100 mb-2 leading-tight">
+                                    ${ending.title}
+                                </h2>
+                                <p class="text-stone-300 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4">
+                                    ${ending.desc}
+                                </p>
+
+                                <!-- Final Score Summary -->
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+                                    <div class="p-2 sm:p-2.5 rounded-xl bg-stone-900 border border-stone-700 text-center">
+                                        <div class="text-[10px] sm:text-xs text-stone-400">❤️ ${langData.statHealth}</div>
+                                        <div class="text-sm sm:text-base font-bold ${state.health > 0 ? 'text-emerald-400' : 'text-red-400'}">${state.health}/100</div>
+                                    </div>
+                                    <div class="p-2 sm:p-2.5 rounded-xl bg-stone-900 border border-stone-700 text-center">
+                                        <div class="text-[10px] sm:text-xs text-stone-400">⛓️ ${langData.statExhaustion}</div>
+                                        <div class="text-sm sm:text-base font-bold ${state.exhaustion < 100 ? 'text-sky-400' : 'text-red-400'}">${state.exhaustion}/100</div>
+                                    </div>
+                                    <div class="p-2 sm:p-2.5 rounded-xl bg-stone-900 border border-stone-700 text-center">
+                                        <div class="text-[10px] sm:text-xs text-stone-400">💵 ${langData.statWealth}</div>
+                                        <div class="text-sm sm:text-base font-bold ${state.wealth >= 32 ? 'text-amber-300' : 'text-red-400'}">$${state.wealth} / $32</div>
+                                    </div>
+                                    <div class="p-2 sm:p-2.5 rounded-xl bg-stone-900 border border-stone-700 text-center">
+                                        <div class="text-[10px] sm:text-xs text-stone-400">✊ ${langData.statRights}</div>
+                                        <div class="text-sm sm:text-base font-bold ${state.rights >= 70 ? 'text-indigo-300' : 'text-red-400'}">${state.rights} / 70%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : `
+                            <!-- Tab 2: Textbook Reflection & Synthesis -->
+                            <div class="space-y-2.5">
+                                <div class="inline-block px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-400 text-[10px] sm:text-xs font-bold tracking-wider">
+                                    ${langData.reflectionBadge}
+                                </div>
+                                <h2 class="font-display text-base sm:text-xl font-bold text-stone-100 leading-snug">
+                                    ${langData.reflectionTitle}
+                                </h2>
+                                <div class="space-y-2">
+                                    ${langData.reflectionPoints.map(pt => `
+                                        <div class="p-2.5 rounded-xl bg-stone-900/90 border border-stone-700/80">
+                                            <h3 class="font-bold text-amber-400 text-xs sm:text-sm mb-0.5">${pt.concept}</h3>
+                                            <p class="text-stone-300 text-[11px] sm:text-xs leading-relaxed">${pt.detail}</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="p-2.5 sm:p-3 rounded-xl bg-amber-950/40 border border-amber-600/50">
+                                    <div class="font-bold text-amber-300 text-xs mb-0.5">${langData.reflectionQuestionTitle}</div>
+                                    <p class="text-stone-200 text-[11px] sm:text-xs italic leading-relaxed">${langData.reflectionQuestion}</p>
+                                </div>
+                            </div>
+                        `}
+
+                        <button onclick="startGame()" class="brass-btn shrink-0 w-full py-3 sm:py-3.5 px-5 rounded-xl text-sm sm:text-base cursor-pointer mt-3">
+                            ${langData.playAgainBtn}
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+        }
+
+        // Initialize UI on window load
+        window.onload = function () {
+            updateStaticUI();
+            render();
+        };
+    </script>
+</body>
+</html>
